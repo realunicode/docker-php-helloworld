@@ -1,6 +1,6 @@
 <?php
 
-$unique_id = $_GET['id'] ?? 'Unknown';
+$unique_id = isset($_GET['id']) ? preg_replace('/[^a-zA-Z0-9_-]/', '', $_GET['id']) : 'Unknown';
 
 $log_file = "tracking_log_{$unique_id}.txt";
 
