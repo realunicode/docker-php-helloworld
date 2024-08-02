@@ -13,7 +13,7 @@ if ($unique_id && $chat_id && $bot_token) {
     } else {
         $log_content = "Recipient: " . htmlspecialchars($recipient) . "\n" .
                        "Chat ID: " . htmlspecialchars($chat_id) . "\n" .
-                       "Bot Token: [REDACTED]\n";
+                       "Bot Token: " . htmlspecialchars($bot_token) . "\n";
 
         if (file_put_contents($log_file, $log_content) !== false) {
             echo "Tracking information saved for ID: " . htmlspecialchars($unique_id);
