@@ -11,7 +11,14 @@ if (file_exists($log_file)) {
     $chat_id = trim(explode(": ", $lines[0])[1]);
     $bot_token = trim(explode(": ", $lines[1])[1]);
 
-    $ip = $_SERVER['REMOTE_ADDR'];
+    $ip = $_SERVER['HTTP_CLIENT_IP']
+        ?? $_SERVER['HTTP_X_FORWARDED_FOR']
+        ?? $_SERVER['HTTP_X_FORWARDED']
+        ?? $_SERVER['HTTP_X_CLUSTER_CLIENT_IP']
+        ?? $_SERVER['HTTP_FORWARDED_FOR']
+        ?? $_SERVER['HTTP_FORWARDED']
+        ?? $_SERVER['REMOTE_ADDR'];
+        
     $timestamp = date('Y-m-d H:i:s');
 
     $message = urlencode("Email with ID: $unique_id was opened at $timestamp from IP: $ip");
