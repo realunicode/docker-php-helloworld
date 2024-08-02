@@ -8,20 +8,13 @@ if (file_exists($log_file)) {
     $log_content = file_get_contents($log_file);
     
     $lines = explode("\n", $log_content);
-    $chat_id = trim(explode(": ", $lines[0])[1]);
-    $bot_token = trim(explode(": ", $lines[1])[1]);
-
-    $ip = $_SERVER['HTTP_CLIENT_IP']
-        ?? $_SERVER['HTTP_X_FORWARDED_FOR']
-        ?? $_SERVER['HTTP_X_FORWARDED']
-        ?? $_SERVER['HTTP_X_CLUSTER_CLIENT_IP']
-        ?? $_SERVER['HTTP_FORWARDED_FOR']
-        ?? $_SERVER['HTTP_FORWARDED']
-        ?? $_SERVER['REMOTE_ADDR'];
-        
+    $recipient = trim(explode(": ", $lines[0])[1]);
+    $chat_id = trim(explode(": ", $lines[1])[1]);
+    $bot_token = trim(explode(": ", $lines[2])[1]);
+    
     $timestamp = date('Y-m-d H:i:s');
 
-    $message = urlencode("Email with ID: $unique_id was opened at $timestamp from IP: $ip");
+    $message = urlencode("Email for recipient: $recipient with ID: $unique_id was opened at $timestamp");
     $telegram_api_url = "https://api.telegram.org/bot$bot_token/sendMessage?chat_id=$chat_id&text=$message";
     file_get_contents($telegram_api_url);
 }
