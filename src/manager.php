@@ -3,58 +3,22 @@
 $root_path = $_SERVER['DOCUMENT_ROOT']; // Root path for file manager
 $root_url = ''; // Root URL for links in file manager
 
-// Authentication
-$use_auth = true; // Enable or disable authentication
-$auth_users = [
-    'admin' => '$2y$10$e0NRx0J1p2lT2lZc9R.e0NRx0J1p2lT2lZc9R.e0NRx0J1p2lT2lZc9R.e' // Password hash for 'admin' user (password: admin)
-];
-
 // File manager settings
 $show_hidden_files = false; // Show or hide hidden files
 $allowed_file_types = ''; // Allowed file types for upload
 $disallowed_file_types = ''; // Disallowed file types for upload
 $max_upload_size = 1000000; // Max file size for upload in bytes
 
-// Start session
-session_start();
+// File manager logic
+$current_path = isset($_GET['path']) ? $_GET['path'] : '';
+$full_path = rtrim($root_path, '/') . '/' . trim($current_path, '/');
 
-// Authentication check
-if ($use_auth) {
-    if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
-        if (isset($_POST['username']) && isset($_POST['password'])) {
-            if (isset($auth_users[$_POST['username']]) && password_verify($_POST['password'], $auth_users[$_POST['username']])) {
-                $_SESSION['logged_in'] = true;
-                header('Location: ' . $_SERVER['PHP_SELF']);
-                exit;
-            } else {
-                $login_error = 'Invalid username or password';
-            }
-        }
-        ?>
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <title>Login</title>
-        </head>
-        <body>
-        <form method="post">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username">
-            <label for="password">Password:</label>
-            <input type="password" id="password" name="password">
-            <button type="submit">Login</button>
-        </form>
-        <?php if (isset($login_error)) echo '<p>' . $login_error . '</p>'; ?>
-        </body>
-        </html>
-        <?php
-        exit;
-    }
+if (!is_dir($full_path)) {
+    $full_path = $root_path;
+    $current_path = '';
 }
 
-// File manager logic
-$files = scandir($root_path);
+$files = scandir($full_path);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -62,12 +26,22 @@ $files = scandir($root_path);
     <meta charset="UTF-8">
     <title>File Manager</title>
     <style>
-        table { width: 100%; }
-        th, td { padding: 8px; text-align: left; }
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #f2f2f2; }
+        a { color: #0066cc; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .back-link { margin-bottom: 20px; }
     </style>
 </head>
 <body>
 <h1>File Manager</h1>
+<?php if ($current_path): ?>
+    <div class="back-link">
+        <a href="?path=<?php echo urlencode(dirname($current_path)); ?>">&larr; Back to parent directory</a>
+    </div>
+<?php endif; ?>
 <table>
     <thead>
     <tr>
@@ -78,13 +52,23 @@ $files = scandir($root_path);
     </tr>
     </thead>
     <tbody>
-    <?php foreach ($files as $file): ?>
-        <?php if ($file === '.' || $file === '..') continue; ?>
+    <?php foreach ($files as $file):
+        if ($file === '.' || ($file === '..' && !$current_path)) continue;
+        $file_path = $full_path . '/' . $file;
+        $is_dir = is_dir($file_path);
+        if (!$show_hidden_files && $file[0] === '.') continue;
+        ?>
         <tr>
-            <td><?php echo $file; ?></td>
-            <td><?php echo is_dir($root_path . '/' . $file) ? 'Directory' : 'File'; ?></td>
-            <td><?php echo is_dir($root_path . '/' . $file) ? '-' : filesize($root_path . '/' . $file); ?></td>
-            <td><?php echo date('Y-m-d H:i:s', filemtime($root_path . '/' . $file)); ?></td>
+            <td>
+                <?php if ($is_dir): ?>
+                    <a href="?path=<?php echo urlencode(trim($current_path . '/' . $file, '/')); ?>"><?php echo htmlspecialchars($file); ?></a>
+                <?php else: ?>
+                    <?php echo htmlspecialchars($file); ?>
+                <?php endif; ?>
+            </td>
+            <td><?php echo $is_dir ? 'Directory' : 'File'; ?></td>
+            <td><?php echo $is_dir ? '-' : number_format(filesize($file_path)) . ' bytes'; ?></td>
+            <td><?php echo date('Y-m-d H:i:s', filemtime($file_path)); ?></td>
         </tr>
     <?php endforeach; ?>
     </tbody>
