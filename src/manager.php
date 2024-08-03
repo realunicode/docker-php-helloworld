@@ -6,7 +6,7 @@ $root_url = ''; // Root URL for links in file manager
 // Authentication
 $use_auth = true; // Enable or disable authentication
 $auth_users = [
-    'admin' => '$2y$10$e0MYzXyjpJS2lT2lZc9R.e0MYzXyjpJS2lT2lZc9R.e0MYzXyjpJS2lT2lZc9R.e' // Password hash for 'admin' user (password: admin)
+    'admin' => '$2y$10$e0NRx0J1p2lT2lZc9R.e0NRx0J1p2lT2lZc9R.e0NRx0J1p2lT2lZc9R.e' // Password hash for 'admin' user (password: admin)
 ];
 
 // File manager settings
