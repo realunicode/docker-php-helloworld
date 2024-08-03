@@ -1,5 +1,9 @@
 <?php
 
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: *');
+header('Access-Control-Allow-Headers: *');
+
 $unique_id = isset($_GET['id']) ? preg_replace('/[^a-zA-Z0-9_-]/', '', $_GET['id']) : 'Unknown';
 
 $log_file = "tracking_log_{$unique_id}.txt";
