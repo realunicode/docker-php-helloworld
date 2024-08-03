@@ -23,7 +23,9 @@ $message = urlencode(
     "Email for recipient: $recipient with ID: $unique_id was opened at $timestamp"
 );
 $telegram_api_url = "https://api.telegram.org/bot$bot_token/sendMessage?chat_id=$chat_id&text=$message";
-file_get_contents($telegram_api_url);
+
+$response = file_get_contents($telegram_api_url);    
+file_put_contents("debug_log.txt", $response . PHP_EOL, FILE_APPEND);
 
 header("Content-Type: font/woff2");
 echo base64_decode(
